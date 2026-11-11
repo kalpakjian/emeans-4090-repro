@@ -34,6 +34,10 @@ git clone <this repo> && cd emeans-4090-repro
 ./run.sh push        # 重算 RESULTS.md，commit 並推回 repo
 ```
 
+`push` 需要那台機器對 repo 有寫入權限（`gh auth login` 一次，或設好 SSH key / PAT），
+並先做過 `git config user.name` 與 `user.email`。不想設權限也行：`run.sh` 跑完後
+`results/`、`RESULTS.md` 都已在本地 commit 好，之後在任何地方 `git push` 即可。
+
 結果檔案：`RESULTS.md`（人看）、`results/**.json`（機器看，官方腳本原生產物）、
 `results/summary.txt`（官方 `table3 --print` 的輸出，用來交叉核對 `report.py`）。
 
