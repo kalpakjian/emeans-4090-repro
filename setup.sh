@@ -30,5 +30,11 @@ else
     echo "patch applied"
 fi
 
+# SPACEV and SimSearchNet++ time Flash-KMeans with squared norms in float32 (see paper_xb.MATCHED):
+# float16 norms overflow on those two corpora. paper_xb.py refuses to run them without this copy,
+# so build it here rather than five minutes into ./run.sh quick.
+export EMEANS_CACHE=${EMEANS_CACHE:-$REPO/cache}
+python "$REPO/.deps/faiss/benchs/e_means/paper_flash_matched.py"
+
 echo "setup ok: $(python -V 2>&1), torch $(python -c 'import torch; print(torch.__version__)')"
 echo "next: ./.venv/bin/python preflight.py"

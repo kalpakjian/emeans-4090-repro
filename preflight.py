@@ -89,6 +89,18 @@ def flash():
     return "0.3.1, batch_kmeans_Euclid importable"
 
 
+def flash_matched():
+    """SPACEV/SimSearchNet++ time a float32-norms Flash copy; paper_xb.py exits without it."""
+    cache = os.environ.get("EMEANS_CACHE") or os.path.join(REPO, "cache")
+    marker = os.path.join(cache, "flash_matched", "VERSION")
+    if not os.path.exists(marker):
+        raise FileNotFoundError("%s missing: run ./setup.sh (paper_flash_matched.py)" % marker)
+    with open(marker, encoding="utf-8") as fh:
+        version = fh.read().strip()
+    assert version == "0.3.1", "flash_matched built from %s, need 0.3.1: re-run ./setup.sh" % version
+    return "0.3.1, float32 norms, %s" % os.path.dirname(marker)
+
+
 def datasets():
     """Load every 1M dataset the way the scripts will (memory maps, no copy)."""
     os.environ["EMEANS_DATA"] = DATA
@@ -117,6 +129,7 @@ def main():
     check("faiss-cpu", faiss_pkg)
     check("faiss checkout", checkout)
     check("flash-kmeans", flash)
+    check("flash float32 norms", flash_matched)
     check("e-means gpu run", emeans_smoke)
     check("1M datasets", datasets)
     check("disk", disk)

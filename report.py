@@ -139,7 +139,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
-    if missed:
-        lines += ["", "## Seeds that never crossed", ""]
-        lines += ["- %s seed %d" % (d, s) for d, s in missed]

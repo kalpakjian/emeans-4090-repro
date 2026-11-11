@@ -18,6 +18,7 @@ git clone https://github.com/kalpakjian/emeans-4090-repro.git
 cd emeans-4090-repro
 ./setup.sh                       # venv + torch 2.15.0 + faiss-cpu 1.16.0 + flash-kmeans 0.3.1
                                  # + faiss v1.16.0 checkout 並套用 patch
+                                 # + cache/flash_matched（SPACEV/SimSearchNet++ 的 float32-norms 版）
 ./run.sh download                # 1M 資料 4.5 GB，含 fingerprint 校驗
 .venv/bin/python preflight.py    # 全部 ok 才繼續（十秒內就會告訴你哪裡壞）
 ./run.sh quick                   # DEEP* 1M + SPACEV 1M，seeds 10/11/12
@@ -70,6 +71,10 @@ cd emeans-4090-repro
    若 import 失敗，多半是 Triton 與 torch 版本不匹配，別自己升級其中一個。
 3. 4090 只有 24 GB：1M 全部資料集沒問題，**10M 的 DINOv3/SimSearchNet++ 可能吃不下**
    （論文在 100M 會用到 51 GB VRAM）。要放大到 10M 前先看 `preflight` 的記憶體估算。
+4. **SPACEV / SimSearchNet++** 的 baseline 用的是「平方範數算在 float32」的 Flash-KMeans 副本
+   （`cache/flash_matched`），因為 float16 的最大值 65,504 撐不住這兩個語料的範數（分別達 6.2e4 / 4.3e6）。
+   `setup.sh` 會自動建好，`preflight` 也會檢查；若缺這個副本，`paper_xb.py` 會直接 `sys.exit`，
+   而不是給你一個看起來對、其實不是論文的 baseline。
 
 ## Windows 端的預先驗證（已完成）
 
