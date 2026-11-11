@@ -1,0 +1,13 @@
+diff --git a/benchs/e_means/paper_xb.py b/benchs/e_means/paper_xb.py
+index 739790f..d228828 100644
+--- a/benchs/e_means/paper_xb.py
++++ b/benchs/e_means/paper_xb.py
+@@ -180,7 +180,7 @@ def run_emeans(name, train, init, seed, epochs, route):
+     n, d = train.shape
+     k = k_for(n)
+     model = Emeans
+-    kw = dict(seed=seed, batch_law=batch_law(n), assignment_backend="cute")
++    kw = dict(seed=seed, batch_law=batch_law(n), assignment_backend=os.environ.get("XB_BACKEND", "auto"))
+     if epochs < 1:                     # below one pass the paper keeps the one-pass batch, step
+         kw["batch_size"], kw["alpha0"] = _resolve_recipe(n, k, 1.0, kw["batch_law"], None, None)
+     if route == "cast":
