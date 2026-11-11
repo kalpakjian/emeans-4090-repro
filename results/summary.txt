@@ -1,0 +1,14 @@
+1M rows
+  deep1b-1M             3 seeds (3 crossed): 2.0 epochs,  12.5x   crossings [1.8, 2.0, 2.2]
+  dino10b-1M-div4096   no runs
+  spacev-1M             3 seeds (3 crossed): 2.0 epochs,  21.7x   crossings [2.0, 2.0, 2.4]
+  fb-ssnpp-1M          no runs
+10M rows
+  deep1b-10M           no runs
+  dino10b-10M-div4096  no runs
+  spacev-10M           no runs
+  fb-ssnpp-10M         no runs
+100M rows
+  deep1b-100M          no runs
+  spacev-100M          no runs
+  fb-ssnpp-100M        no runs
