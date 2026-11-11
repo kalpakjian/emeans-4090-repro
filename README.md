@@ -14,7 +14,8 @@
 ## 在 Omarchy 上跑（四步）
 
 ```bash
-git clone <this repo> && cd emeans-4090-repro
+git clone https://github.com/kalpakjian/emeans-4090-repro.git
+cd emeans-4090-repro
 ./setup.sh                       # venv + torch 2.15.0 + faiss-cpu 1.16.0 + flash-kmeans 0.3.1
                                  # + faiss v1.16.0 checkout 並套用 patch
 ./run.sh download                # 1M 資料 4.5 GB，含 fingerprint 校驗
