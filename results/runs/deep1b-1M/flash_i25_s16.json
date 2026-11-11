@@ -1,0 +1,24 @@
+{
+ "method": "flash",
+ "dataset": "deep1b-1M",
+ "seed": 16,
+ "iterations": 25,
+ "n": 1000000,
+ "k": 16384,
+ "seconds": 1.0029745589999948,
+ "seconds_calls": [
+  0.9927798280000388,
+  1.0029745589999948,
+  1.004477841000039
+ ],
+ "test_mse": 0.38927482371488215,
+ "gpu": "NVIDIA GeForce RTX 4090",
+ "device": "cuda:0",
+ "visible_gpus": 1,
+ "torch": "2.15.0+cu132",
+ "triton": "3.9.0",
+ "flash_api": "batch_kmeans_Euclid",
+ "flash_norms": "float16",
+ "flash_package": "/home/kalpakjian/Projects/emeans-4090-repro/.venv/lib/python3.14/site-packages/flash_kmeans",
+ "flash_version": "0.3.1"
+}

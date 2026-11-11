@@ -1,0 +1,113 @@
+{
+ "dataset": "fb-ssnpp-1M",
+ "seed": 11,
+ "target": 113563.09457578124,
+ "target_source": "measure",
+ "flash": {
+  "method": "flash",
+  "dataset": "fb-ssnpp-1M",
+  "seed": 11,
+  "iterations": 25,
+  "n": 1000000,
+  "k": 16384,
+  "seconds": 2.5681604549999975,
+  "seconds_calls": [
+   2.5681604549999975
+  ],
+  "test_mse": 113563.09457578124,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "device": "cuda:0",
+  "visible_gpus": 1,
+  "torch": "2.15.0+cu132",
+  "triton": "3.9.0",
+  "flash_api": "kmeans_largeN",
+  "flash_norms": "float32",
+  "flash_package": "/home/kalpakjian/Projects/emeans-4090-repro/cache/flash_matched/flash_kmeans",
+  "flash_version": "0.3.1"
+ },
+ "emeans": [
+  {
+   "method": "emeans",
+   "dataset": "fb-ssnpp-1M",
+   "seed": 11,
+   "epochs": 1.0,
+   "input": "cast",
+   "n": 1000000,
+   "k": 16384,
+   "seconds": 0.07789170799992462,
+   "seconds_calls": [
+    0.09109233899994251,
+    0.07779666700002963,
+    0.07789170799992462
+   ],
+   "test_mse": 114026.77886704294,
+   "gpu": "NVIDIA GeForce RTX 4090",
+   "device": "cuda:0",
+   "visible_gpus": 1,
+   "torch": "2.15.0+cu132",
+   "triton": "3.9.0",
+   "batch": 32768,
+   "alpha0": 0.21717002111744266,
+   "representation": "bfloat16",
+   "assignment_backend": "triton",
+   "emeans_path": "/home/kalpakjian/Projects/emeans-4090-repro/.venv/lib/python3.14/site-packages/faiss/contrib/e_means",
+   "emeans_source_sha256": "7a4c8489e2410777"
+  },
+  {
+   "method": "emeans",
+   "dataset": "fb-ssnpp-1M",
+   "seed": 11,
+   "epochs": 1.2,
+   "input": "cast",
+   "n": 1000000,
+   "k": 16384,
+   "seconds": 0.0932187729999896,
+   "seconds_calls": [
+    0.10540895099984482,
+    0.0931686809999519,
+    0.0932187729999896
+   ],
+   "test_mse": 113653.16864154441,
+   "gpu": "NVIDIA GeForce RTX 4090",
+   "device": "cuda:0",
+   "visible_gpus": 1,
+   "torch": "2.15.0+cu132",
+   "triton": "3.9.0",
+   "batch": 32768,
+   "alpha0": 0.21302492244724888,
+   "representation": "bfloat16",
+   "assignment_backend": "triton",
+   "emeans_path": "/home/kalpakjian/Projects/emeans-4090-repro/.venv/lib/python3.14/site-packages/faiss/contrib/e_means",
+   "emeans_source_sha256": "7a4c8489e2410777"
+  },
+  {
+   "method": "emeans",
+   "dataset": "fb-ssnpp-1M",
+   "seed": 11,
+   "epochs": 1.4,
+   "input": "cast",
+   "n": 1000000,
+   "k": 16384,
+   "seconds": 0.10780658099997709,
+   "seconds_calls": [
+    0.12000809400001344,
+    0.10780658099997709,
+    0.10778826199998548
+   ],
+   "test_mse": 113447.67342925713,
+   "gpu": "NVIDIA GeForce RTX 4090",
+   "device": "cuda:0",
+   "visible_gpus": 1,
+   "torch": "2.15.0+cu132",
+   "triton": "3.9.0",
+   "batch": 32768,
+   "alpha0": 0.20958207710626767,
+   "representation": "bfloat16",
+   "assignment_backend": "triton",
+   "emeans_path": "/home/kalpakjian/Projects/emeans-4090-repro/.venv/lib/python3.14/site-packages/faiss/contrib/e_means",
+   "emeans_source_sha256": "7a4c8489e2410777"
+  }
+ ],
+ "crossing": 1.4,
+ "speedup": 23.821926557531246
+}

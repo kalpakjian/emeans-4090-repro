@@ -1,0 +1,24 @@
+{
+ "method": "flash",
+ "dataset": "spacev-1M",
+ "seed": 17,
+ "iterations": 25,
+ "n": 1000000,
+ "k": 16384,
+ "seconds": 1.7589753129998371,
+ "seconds_calls": [
+  1.7565105520000088,
+  1.7589753129998371,
+  1.7638283680000768
+ ],
+ "test_mse": 7227.092412737292,
+ "gpu": "NVIDIA GeForce RTX 4090",
+ "device": "cuda:0",
+ "visible_gpus": 1,
+ "torch": "2.15.0+cu132",
+ "triton": "3.9.0",
+ "flash_api": "batch_kmeans_Euclid",
+ "flash_norms": "float32",
+ "flash_package": "/home/kalpakjian/Projects/emeans-4090-repro/cache/flash_matched/flash_kmeans",
+ "flash_version": "0.3.1"
+}
