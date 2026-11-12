@@ -1,0 +1,42 @@
+name: report tests
+
+# report.py is the part of this repo that has to work everywhere: stdlib only, no torch, no GPU.
+# The tests build a scratch results/ tree and read the generated markdown back, so they run on a
+# bare interpreter in seconds.
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Shell entry points parse
+        run: |
+          bash -n setup.sh
+          bash -n run.sh
+
+      - name: Python entry points compile
+        run: python -m py_compile report.py preflight.py
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Every patch applies to a pristine FAISS v1.16.0
+        run: |
+          git clone -q --depth 1 --branch v1.16.0 \
+            https://github.com/facebookresearch/faiss.git /tmp/faiss
+          for p in patches/*.patch; do
+            echo "== $p"
+            git -C /tmp/faiss apply --check "$p"
+            git -C /tmp/faiss apply "$p"
+          done
+          ! grep -rn 'assignment_backend="cute"' \
+            /tmp/faiss/benchs/e_means/paper_xb.py \
+            /tmp/faiss/benchs/e_means/paper_bench.py
