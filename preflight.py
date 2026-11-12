@@ -59,10 +59,20 @@ def faiss_pkg():
 
 
 def checkout():
-    pxb = os.path.join(BENCH, "paper_xb.py")
-    assert os.path.exists(pxb), "missing %s: run ./setup.sh" % pxb
-    with open(pxb, encoding="utf-8") as fh:
-        assert "XB_BACKEND" in fh.read(), "paper_xb.py is not patched: run ./setup.sh"
+    """Both scripts that pick an assignment backend must honour XB_BACKEND.
+
+    paper_xb.run_emeans drives Table 3; paper_bench.fig3_emeans drives Figure 3. 0001 patches the
+    first, 0002 the second; a bare `assignment_backend="cute"` in either is an SM89 dead end.
+    """
+    for name, what in (("paper_xb.py", "Table 3"), ("paper_bench.py", "Figure 3")):
+        path = os.path.join(BENCH, name)
+        assert os.path.exists(path), "missing %s: run ./setup.sh" % path
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        assert 'assignment_backend="cute"' not in text, \
+            "%s still hardcodes the CuTe backend (%s): run ./setup.sh" % (name, what)
+        assert "XB_BACKEND" in text, \
+            "%s does not read XB_BACKEND (%s): run ./setup.sh" % (name, what)
     return "patched, backend=%s" % BACKEND
 
 

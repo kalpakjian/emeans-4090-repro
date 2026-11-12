@@ -22,13 +22,15 @@ if [ ! -d .deps/faiss ]; then
     git clone -q --depth 1 --branch "$FAISS_TAG" https://github.com/facebookresearch/faiss.git .deps/faiss
 fi
 
-# Idempotent: skip if already applied.
-if git -C .deps/faiss apply --reverse --check "$REPO/patches/0001-xb-backend-env.patch" 2>/dev/null; then
-    echo "patch already applied"
-else
-    git -C .deps/faiss apply "$REPO/patches/0001-xb-backend-env.patch"
-    echo "patch applied"
-fi
+# Idempotent: a patch whose reverse applies cleanly is already in.
+for p in "$REPO"/patches/*.patch; do
+    if git -C .deps/faiss apply --reverse --check "$p" 2>/dev/null; then
+        echo "patch already applied: $(basename "$p")"
+    else
+        git -C .deps/faiss apply "$p"
+        echo "patch applied: $(basename "$p")"
+    fi
+done
 
 # SPACEV and SimSearchNet++ time Flash-KMeans with squared norms in float32 (see paper_xb.MATCHED):
 # float16 norms overflow on those two corpora. paper_xb.py refuses to run them without this copy,

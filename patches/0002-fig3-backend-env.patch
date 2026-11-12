@@ -1,0 +1,14 @@
+diff --git a/benchs/e_means/paper_bench.py b/benchs/e_means/paper_bench.py
+index ab1f67a..5af375b 100644
+--- a/benchs/e_means/paper_bench.py
++++ b/benchs/e_means/paper_bench.py
+@@ -276,7 +276,8 @@ def fig3_emeans(x, test, k, seed, c0, route):
+     route = route or "cast"
+     xg = torch.from_numpy(x).cuda()
+     model = Emeans
+-    kw = dict(seed=seed, batch_law=xb.batch_law(n), assignment_backend="cute",
++    kw = dict(seed=seed, batch_law=xb.batch_law(n),
++              assignment_backend=os.environ.get("XB_BACKEND", "auto"),
+               capture_assignments=True)
+     if route == "cast":
+         model = QuantizedEmeans

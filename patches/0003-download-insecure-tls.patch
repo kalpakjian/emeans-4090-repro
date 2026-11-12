@@ -1,0 +1,37 @@
+diff --git a/benchs/e_means/paper_download.py b/benchs/e_means/paper_download.py
+index 534f7b9..a1e7d18 100644
+--- a/benchs/e_means/paper_download.py
++++ b/benchs/e_means/paper_download.py
+@@ -22,12 +22,23 @@ import argparse
+ import concurrent.futures
+ import json
+ import os
++import ssl
+ import sys
+ import time
+ import urllib.request
+ 
+ import numpy as np
+ 
++# dl.fbaipublicfiles.com served a certificate that expired 2026-11-11, which breaks the 10M
++# DINOv3/SIFT/SimSearchNet++ prefixes. An unverified context is allowed only when the operator
++# asks for it; every downloaded file is still checked against the paper's fingerprints below,
++# which is what actually guarantees the bytes are the paper's.
++_OPENER = urllib.request.build_opener(
++    urllib.request.HTTPSHandler(context=ssl._create_unverified_context())
++    if os.environ.get("EMEANS_INSECURE_TLS") == "1" else urllib.request.HTTPSHandler())
++if os.environ.get("EMEANS_INSECURE_TLS") == "1":
++    print("warning: EMEANS_INSECURE_TLS=1, TLS verification is off for this download", flush=True)
++
+ HERE = os.path.dirname(os.path.abspath(__file__))
+ sys.path.insert(0, HERE)
+ import paper_data as data  # noqa: E402
+@@ -200,7 +211,7 @@ def fetch(url, start, stop, tries=6):
+     for attempt in range(tries):
+         try:
+             req = urllib.request.Request(url, headers={"Range": "bytes=%d-%d" % (start, stop - 1)})
+-            with urllib.request.urlopen(req, timeout=120) as r:
++            with _OPENER.open(req, timeout=120) as r:
+                 if r.status == 206:
+                     expected = "bytes %d-%d/" % (start, stop - 1)
+                     answered = r.headers.get("Content-Range") or ""

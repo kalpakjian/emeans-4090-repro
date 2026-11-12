@@ -5,10 +5,13 @@
 
 ## 為什麼不是照論文 README 原封不動跑
 
-官方 `benchs/e_means/paper_xb.py` 把 backend 寫死成 `assignment_backend="cute"`，而 CuTe kernel 只針對
-**SM90（H100/H200）**。4090 是 SM89，會在第一次 assignment 就失敗。
-`patches/0001-xb-backend-env.patch` 把它改成讀 `XB_BACKEND`（預設 `auto`）：
-在 H100 上仍解析成 CuTe，在 4090 上解析成 Triton。其餘計時協定完全沒動
+官方有 **兩個** 地方把 backend 寫死成 `assignment_backend="cute"`：
+`benchs/e_means/paper_xb.py`（`run_emeans`，Table 3）與 `benchs/e_means/paper_bench.py`
+（`fig3_emeans`，Figure 3）。而 CuTe kernel 只針對 **SM90（H100/H200）**，
+4090 是 SM89，會在第一次 assignment 就失敗（本機實測：`CuTe assignment requires
+quack-kernels==0.6.5 ... (optional CuTe stack is unavailable)`）。
+`patches/0001-xb-backend-env.patch` 與 `patches/0002-fig3-backend-env.patch` 各修一個，改成讀
+`XB_BACKEND`（預設 `auto`）：在 H100 上仍解析成 CuTe，在 4090 上解析成 Triton。其餘計時協定完全沒動
 （每次 run 獨立 process、未計時 warm-up、同一 job 同一張卡、同一個 float64 scorer）。
 
 ## 在 Omarchy 上跑（四步）
@@ -31,10 +34,16 @@ cd emeans-4090-repro
 接著：
 
 ```bash
-./run.sh full        # Table 3 全部四組資料 × 10 seeds（放過夜）
-./run.sh figure3     # 可選：Figure 3（e-means 之後換 Faiss CPU k-means）
+./run.sh full        # Table 3 全部四組資料 × 10 seeds（1M 實測約 15 分鐘，見下表）
+./run.sh figure3-1m  # 可選：Figure 3 的兩個 1M 面板（e-means 之後換 Faiss CPU k-means）
+./run.sh download10m # 可選：補到 21.7 GB，10M 的前綴檔
+./run.sh full10m     # 可選：Table 3 at 10M 的 DEEP*/SPACEV/SimSearchNet++
 ./run.sh push        # 重算 RESULTS.md，commit 並推回 repo
 ```
+
+`full10m` **刻意不含 `dino10b-10M-div4096`**：10M × 1024 維的 bf16 資料本身就要 20.5 GB，
+24 GB 的 4090 在 assignment 前就會 OOM。要親自確認就 `bench table3 --dataset dino10b-10M-div4096`，
+失敗是預期結果。`figure3`（不帶 `-1m`）會連 10M 的 SPACEV/SIFT 面板一起畫，需要先 `download10m`。
 
 `push` 需要那台機器對 repo 有寫入權限（`gh auth login` 一次，或設好 SSH key / PAT），
 並先做過 `git config user.name` 與 `user.email`。不想設權限也行：`run.sh` 跑完後
@@ -47,12 +56,14 @@ cd emeans-4090-repro
 
 | tier | 內容 | 估計 |
 |---|---|---|
-| setup + download | 安裝、4.5 GB 下載 | 3–10 分鐘（看網路） |
-| quick | 2 資料集 × 3 seeds，每個 seed 1 次 Flash@25 + 最多 13 次 e-means | 約 20 分鐘 |
-| full | 4 資料集 × 10 seeds | 數小時，建議過夜 |
+| setup + download | 安裝、4.5 GB 下載 | 實測 setup 約 2 分鐘、下載約 70 秒（69 MB/s） |
+| quick | 2 資料集 × 3 seeds，每個 seed 1 次 Flash@25 + 最多 13 次 e-means | 實測約 2 分鐘 |
+| full | 4 資料集 × 10 seeds | **實測約 15 分鐘**（不是「放過夜」） |
+| figure3-1m | 2 個 1M 面板 × 1 seed | e-means 臂幾十秒；Faiss CPU 臂才是大宗（25 次 Lloyd @ k=16384） |
 
 單次 run 的 GPU 計算其實只有零點幾秒（論文在 H100 上 10M×2 epochs 是 0.52 s），
 **時間幾乎都花在「每次 run 開一個新 process + 載入 torch」**，這是官方協定刻意的。
+所以 1M 全表比原本估的「數小時」快一個量級：真正的成本在 Faiss CPU 的 Figure 3。
 
 ## 這些數字能說什麼、不能說什麼
 
@@ -71,10 +82,18 @@ cd emeans-4090-repro
    若 import 失敗，多半是 Triton 與 torch 版本不匹配，別自己升級其中一個。
 3. 4090 只有 24 GB：1M 全部資料集沒問題，**10M 的 DINOv3/SimSearchNet++ 可能吃不下**
    （論文在 100M 會用到 51 GB VRAM）。要放大到 10M 前先看 `preflight` 的記憶體估算。
+   實測：`dino10b-10M-div4096` 光是把 10M × 1024 維轉 bf16 就 20.5 GB，assignment 之前就 OOM，
+   所以 `./run.sh full10m` 刻意只跑 DEEP*／SPACEV／SimSearchNet++ 三組。
 4. **SPACEV / SimSearchNet++** 的 baseline 用的是「平方範數算在 float32」的 Flash-KMeans 副本
    （`cache/flash_matched`），因為 float16 的最大值 65,504 撐不住這兩個語料的範數（分別達 6.2e4 / 4.3e6）。
    `setup.sh` 會自動建好，`preflight` 也會檢查；若缺這個副本，`paper_xb.py` 會直接 `sys.exit`，
    而不是給你一個看起來對、其實不是論文的 baseline。
+5. **`dl.fbaipublicfiles.com` 的憑證在 2026-11-11 到期**（`notAfter=Nov 11 23:59:59 2026 GMT`），
+   而 10M 的 DINOv3、SIFT、SimSearchNet++ 前綴都放在那裡，所以 `download10m` 會以
+   `CERTIFICATE_VERIFY_FAILED: certificate has expired` 收場。這是上游的事，不是本機時鐘。
+   `patches/0003-download-insecure-tls.patch` 提供 `EMEANS_INSECURE_TLS=1` 這個**要自己開**的開關
+   （預設仍是驗證），真正的完整性保證是腳本結尾的 fingerprint 校驗：
+   `EMEANS_INSECURE_TLS=1 ./run.sh download10m`。等 Meta 換憑證就可以拿掉這個環境變數。
 
 ## Windows 端的預先驗證（已完成）
 
