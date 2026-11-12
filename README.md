@@ -83,6 +83,8 @@ cd emeans-4090-repro
 
 1. **Triton backend 沒在 4090 上被 Meta 驗證過**；CuTe 路線才是論文調過的。若 preflight 的
    e-means 冒煙測試就失敗，先看 `XB_BACKEND=native` 是否能跑（慢但純 PyTorch）。
+   實測（1M × 96、k=16384、1 epoch、暖機後三次取中位數）：`triton` **0.042 s**、
+   `native` **0.301 s**，約 7 倍慢——可以拿來跑通流程，但別用它產出的秒數當結果。
 2. **Flash-KMeans 0.3.1 在 Arch/Python 3.13+ 的 wheel 是 `py3-none-any`**，靠 Triton 編譯；
    若 import 失敗，多半是 Triton 與 torch 版本不匹配，別自己升級其中一個。
 3. 4090 只有 24 GB：1M 全部資料集沒問題，**10M 的 DINOv3/SimSearchNet++ 可能吃不下**
