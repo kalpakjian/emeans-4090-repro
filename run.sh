@@ -40,7 +40,15 @@ case "${1:-}" in
                 bench figure3 --dataset imagenet-clip-512-normalized --method emeans
                 bench figure3 --dataset imagenet-clip-512-normalized --method faiss ;;
     figure4)  bench figure4 --scale 10M ;;
-    figure4-plot) ( cd "$BENCH" && python paper_bench.py figure4 --plot --out "$OUT" ) ;;
+    figure4-plot)
+        # Figure 4's iteration sweep is the only thing that writes flash_i100; Table 3 stops at 25.
+        # Without this check plot_figure4 asks matplotlib for 0 rows and dies in a traceback.
+        if ! ls "$OUT"/runs/*/flash_i100_s*.json >/dev/null 2>&1; then
+            echo "figure4-plot: no Figure 4 runs under $OUT yet (no flash_i100 records):" \
+                 "run ./run.sh figure4 first" >&2
+            exit 2
+        fi
+        ( cd "$BENCH" && python paper_bench.py figure4 --plot --out "$OUT" ) ;;
     report)   python "$REPO/report.py"; exit 0 ;;
     push)
         python "$REPO/report.py"
