@@ -32,7 +32,8 @@ jobs:
         run: |
           git clone -q --depth 1 --branch v1.16.0 \
             https://github.com/facebookresearch/faiss.git /tmp/faiss
-          for p in patches/*.patch; do
+          # absolute paths: `git -C` resolves relative arguments against /tmp/faiss, not the repo
+          for p in "$PWD"/patches/*.patch; do
             echo "== $p"
             git -C /tmp/faiss apply --check "$p"
             git -C /tmp/faiss apply "$p"
