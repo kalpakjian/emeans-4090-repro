@@ -36,7 +36,7 @@ cd emeans-4090-repro
 
 ```bash
 ./run.sh full        # Table 3 全部四組資料 × 10 seeds（1M 實測約 15 分鐘，見下表）
-./run.sh figure3-1m  # 可選：Figure 3 的兩個 1M 面板（e-means 之後換 Faiss CPU k-means）
+./run.sh figure3-1m  # 可選：Figure 3 的兩個 1M 面板，3 seeds（e-means 之後換 Faiss CPU k-means）
 ./run.sh download10m # 可選：補到 21.7 GB，10M 的前綴檔
 ./run.sh full10m     # 可選：Table 3 at 10M 的 DEEP*/SPACEV/SimSearchNet++
 ./run.sh figure4     # 可選：Figure 4（每個資料集 12×12 組，很重，見下表）
@@ -62,8 +62,9 @@ cd emeans-4090-repro
 | setup + download | 安裝、4.5 GB 下載 | 實測 setup 約 2 分鐘、下載約 70 秒（69 MB/s） |
 | quick | 2 資料集 × 3 seeds，每個 seed 1 次 Flash@25 + 最多 13 次 e-means | 實測約 2 分鐘 |
 | full | 4 資料集 × 10 seeds | **實測約 15 分鐘**（不是「放過夜」） |
-| figure3-1m | 2 個 1M 面板 × 1 seed | e-means 臂幾十秒；Faiss CPU 臂才是大宗（25 次 Lloyd @ k=16384） |
-| figure4 | 每個資料集 12 個 Flash 迭代上限 × 12 個 epoch 上限 × seeds | 最重的一項：每個 seed 24 個新 process，10 seeds 就是 240 個；還沒實測過 |
+| figure3-1m | 2 個 1M 面板 × 3 seeds | 實測：e-means 臂每個 seed 幾十秒，Faiss CPU 臂每個 seed 每個面板約 7 分鐘 → 約 45 分鐘 |
+| figure3 | 全部 4 個面板 × 10 seeds | 1M 兩個面板約 2.5 小時；10M 的 Faiss 臂才是大宗（k=65536、10M 列，估計每個面板 3–4 小時），整體約 10 小時 |
+| figure4 | 每個資料集 12 個 Flash 迭代上限 × 12 個 epoch 上限 × seeds | 最重的一項：每個 seed 24 個新 process，10 seeds 就是 240 個；10M 約每個資料集 5 小時（未實測） |
 
 單次 run 的 GPU 計算其實只有零點幾秒（論文在 H100 上 10M×2 epochs 是 0.52 s），
 **時間幾乎都花在「每次 run 開一個新 process + 載入 torch」**，這是官方協定刻意的。

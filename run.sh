@@ -5,8 +5,8 @@
 #   ./run.sh quick       DEEP* 1M + SPACEV 1M, 3 seeds   (~20 min on a 4090)
 #   ./run.sh full        Table 3 at 1M: 4 datasets, 10 seeds (about 15 min, not overnight)
 #   ./run.sh full10m     Table 3 at 10M: DEEP*/SPACEV/SimSearchNet++ (dino10b needs >24 GB)
-#   ./run.sh figure3     Figure 3: e-means then Faiss CPU k-means
-#   ./run.sh figure3-1m  the two 1M Figure 3 panels only, no 10M data needed
+#   ./run.sh figure3     Figure 3, all four panels, 10 seeds (the 10M CPU arms are ~8 h)
+#   ./run.sh figure3-1m  the two 1M panels only, 3 seeds, no 10M data needed (~45 min)
 #   ./run.sh figure4     Figure 4: 12 Flash iteration budgets x 12 e-means epoch budgets per seed
 #                        per dataset (heavy: ~240 fresh processes per dataset at 10 seeds)
 #   ./run.sh figure4-plot draw results/figure4.pdf from whatever figure4 runs exist
@@ -36,10 +36,10 @@ case "${1:-}" in
     #   bench table3 --dataset dino10b-10M-div4096 --seeds 10
     full10m)  for d in deep1b-10M spacev-10M fb-ssnpp-10M; do bench table3 --dataset "$d"; done ;;
     figure3)  bench figure3 --method emeans; bench figure3 --method faiss ;;
-    figure3-1m) bench figure3 --dataset deep1b-1M --method emeans
-                bench figure3 --dataset deep1b-1M --method faiss
-                bench figure3 --dataset imagenet-clip-512-normalized --method emeans
-                bench figure3 --dataset imagenet-clip-512-normalized --method faiss ;;
+    figure3-1m) for d in deep1b-1M imagenet-clip-512-normalized; do
+                    bench figure3 --dataset "$d" --method emeans --seeds 10 11 12
+                    bench figure3 --dataset "$d" --method faiss --seeds 10 11 12
+                done ;;
     figure4)  bench figure4 --scale 10M ;;
     figure4-plot)
         # Figure 4's iteration sweep is the only thing that writes flash_i100; Table 3 stops at 25.
