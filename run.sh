@@ -7,6 +7,9 @@
 #   ./run.sh full10m     Table 3 at 10M: DEEP*/SPACEV/SimSearchNet++ (dino10b needs >24 GB)
 #   ./run.sh figure3     Figure 3: e-means then Faiss CPU k-means
 #   ./run.sh figure3-1m  the two 1M Figure 3 panels only, no 10M data needed
+#   ./run.sh figure4     Figure 4: 12 Flash iteration budgets x 12 e-means epoch budgets per seed
+#                        per dataset (heavy: ~240 fresh processes per dataset at 10 seeds)
+#   ./run.sh figure4-plot draw results/figure4.pdf from whatever figure4 runs exist
 #   ./run.sh report      regenerate RESULTS.md from whatever is in results/
 #   ./run.sh push        report + commit + push
 set -euo pipefail
@@ -36,6 +39,8 @@ case "${1:-}" in
                 bench figure3 --dataset deep1b-1M --method faiss
                 bench figure3 --dataset imagenet-clip-512-normalized --method emeans
                 bench figure3 --dataset imagenet-clip-512-normalized --method faiss ;;
+    figure4)  bench figure4 --scale 10M ;;
+    figure4-plot) ( cd "$BENCH" && python paper_bench.py figure4 --plot --out "$OUT" ) ;;
     report)   python "$REPO/report.py"; exit 0 ;;
     push)
         python "$REPO/report.py"
@@ -44,7 +49,7 @@ case "${1:-}" in
             -m "results: $(date -Is) on $(nvidia-smi --query-gpu=name --format=csv,noheader)"
         git -C "$REPO" push
         exit 0 ;;
-    *)  sed -n '2,11p' "$0"; exit 2 ;;
+    *)  sed -n '2,/^set -euo/p' "$0" | sed '$d'; exit 2 ;;
 esac
 
 # The official table view, as a second opinion on report.py's numbers.
