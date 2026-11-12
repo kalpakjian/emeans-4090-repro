@@ -13,6 +13,7 @@ quack-kernels==0.6.5 ... (optional CuTe stack is unavailable)`）。
 `patches/0001-xb-backend-env.patch` 與 `patches/0002-fig3-backend-env.patch` 各修一個，改成讀
 `XB_BACKEND`（預設 `auto`）：在 H100 上仍解析成 CuTe，在 4090 上解析成 Triton。其餘計時協定完全沒動
 （每次 run 獨立 process、未計時 warm-up、同一 job 同一張卡、同一個 float64 scorer）。
+`benchs/e_means/demo_deep10m.py` 裡的兩處 `cute` 沒有動：那是示範腳本，重現流程不會執行它。
 
 ## 在 Omarchy 上跑（四步）
 
