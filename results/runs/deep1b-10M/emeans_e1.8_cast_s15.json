@@ -1,0 +1,25 @@
+{
+ "method": "emeans",
+ "dataset": "deep1b-10M",
+ "seed": 15,
+ "epochs": 1.8,
+ "input": "cast",
+ "n": 10000000,
+ "k": 65536,
+ "seconds": 2.557838472000185,
+ "seconds_calls": [
+  2.557838472000185
+ ],
+ "test_mse": 0.3423278446744335,
+ "gpu": "NVIDIA GeForce RTX 4090",
+ "device": "cuda:0",
+ "visible_gpus": 1,
+ "torch": "2.15.0+cu132",
+ "triton": "3.9.0",
+ "batch": 32768,
+ "alpha0": 0.03819851430719732,
+ "representation": "bfloat16",
+ "assignment_backend": "triton",
+ "emeans_path": "/home/kalpakjian/Projects/emeans-4090-repro/.venv/lib/python3.14/site-packages/faiss/contrib/e_means",
+ "emeans_source_sha256": "7a4c8489e2410777"
+}

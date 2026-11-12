@@ -1,6 +1,6 @@
 # e-means reproduction on an RTX 4090
 
-Generated 2026-11-12T07:47:03 by `report.py` from 250 run records and 40 crossing records.
+Generated 2026-11-12T09:15:26 by `report.py` from 456 run records and 70 crossing records.
 
 ## Hardware and software
 
@@ -9,10 +9,12 @@ Generated 2026-11-12T07:47:03 by `report.py` from 250 run records and 40 crossin
 | GPU | NVIDIA GeForce RTX 4090 |
 | torch | 2.15.0+cu132 |
 | triton | 3.9.0 |
-| e-means assignment backend | triton (210 runs) |
+| e-means assignment backend | triton (386 runs) |
 | `faiss.contrib.e_means` source hash | 7a4c8489e2410777 |
 
-## Table 3, 1M rows: epochs of e-means to reach Flash-KMeans' error after 25 iterations
+## Table 3: epochs of e-means to reach Flash-KMeans' error after 25 iterations
+
+### 1M rows
 
 | dataset | seeds | crossed | crossing (epochs) | speedup | Flash@25 test MSE | Flash@25 s | e-means s | input | batch |
 |---|---|---|---|---|---|---|---|---|---|
@@ -21,10 +23,29 @@ Generated 2026-11-12T07:47:03 by `report.py` from 250 run records and 40 crossin
 | spacev-1M | 10 | 10 | 2.2 | 19.74x | 7231.73 | 1.76 | 0.09 | cast | 32768 |
 | fb-ssnpp-1M | 10 | 10 | 1.4 | 23.78x | 113564 | 2.57 | 0.11 | cast | 32768 |
 
+### 10M rows
+
+| dataset | seeds | crossed | crossing (epochs) | speedup | Flash@25 test MSE | Flash@25 s | e-means s | input | batch |
+|---|---|---|---|---|---|---|---|---|---|
+| deep1b-10M | 10 | 10 | 2.2 | 13.82x | 0.342221 | 40.33 | 2.92 | cast | 65536 |
+| fb-ssnpp-10M | 10 | 10 | 1.6 | 23.49x | 109505 | 106.57 | 4.55 | cast | 32768 |
+| spacev-10M | 10 | 10 | 2.2 | 21.78x | 6372.86 | 68.62 | 3.39 | cast | 65536 |
+
+
 ## Per seed
 
 | dataset | seed | crossing | speedup | Flash test MSE | Flash s | e-means test MSE | e-means s |
 |---|---|---|---|---|---|---|---|
+| deep1b-10M | 10 | 2.0 | 14.41x | 0.342238 | 39.99 | 0.342215 | 2.77 |
+| deep1b-10M | 11 | 2.8 | 10.28x | 0.341836 | 40.32 | 0.341491 | 3.92 |
+| deep1b-10M | 12 | 2.2 | 13.22x | 0.342203 | 40.44 | 0.342151 | 3.06 |
+| deep1b-10M | 13 | 2.2 | 13.06x | 0.342102 | 40.53 | 0.341565 | 3.10 |
+| deep1b-10M | 14 | 2.4 | 11.84x | 0.341948 | 40.56 | 0.341838 | 3.43 |
+| deep1b-10M | 15 | 1.8 | 15.72x | 0.342687 | 40.20 | 0.342328 | 2.56 |
+| deep1b-10M | 16 | 1.4 | 20.16x | 0.342744 | 40.25 | 0.342621 | 2.00 |
+| deep1b-10M | 17 | 1.6 | 17.70x | 0.342827 | 40.34 | 0.342727 | 2.28 |
+| deep1b-10M | 18 | 2.8 | 10.48x | 0.341742 | 40.39 | 0.341577 | 3.86 |
+| deep1b-10M | 19 | 1.8 | 15.76x | 0.342502 | 40.31 | 0.341672 | 2.56 |
 | deep1b-1M | 10 | 1.8 | 13.94x | 0.389308 | 1.00 | 0.389091 | 0.07 |
 | deep1b-1M | 11 | 2.2 | 11.43x | 0.388473 | 1.00 | 0.388126 | 0.09 |
 | deep1b-1M | 12 | 2.0 | 12.54x | 0.389311 | 1.00 | 0.38794 | 0.08 |
@@ -45,6 +66,16 @@ Generated 2026-11-12T07:47:03 by `report.py` from 250 run records and 40 crossin
 | dino10b-1M-div4096 | 17 | 1.8 | 46.81x | 0.0122854 | 23.90 | 0.0122849 | 0.51 |
 | dino10b-1M-div4096 | 18 | 2.2 | 38.13x | 0.0122737 | 23.82 | 0.0122703 | 0.62 |
 | dino10b-1M-div4096 | 19 | 2.0 | 41.99x | 0.012287 | 23.67 | 0.0122717 | 0.56 |
+| fb-ssnpp-10M | 10 | 1.6 | 23.57x | 109541 | 106.61 | 109450 | 4.52 |
+| fb-ssnpp-10M | 11 | 1.6 | 22.20x | 109527 | 108.56 | 109473 | 4.89 |
+| fb-ssnpp-10M | 12 | 1.6 | 23.73x | 109482 | 108.34 | 109474 | 4.57 |
+| fb-ssnpp-10M | 13 | 1.6 | 23.16x | 109503 | 108.49 | 109459 | 4.68 |
+| fb-ssnpp-10M | 14 | 1.6 | 23.48x | 109495 | 106.23 | 109458 | 4.52 |
+| fb-ssnpp-10M | 15 | 1.6 | 23.03x | 109506 | 106.32 | 109500 | 4.62 |
+| fb-ssnpp-10M | 16 | 1.6 | 23.50x | 109456 | 105.57 | 109448 | 4.49 |
+| fb-ssnpp-10M | 17 | 1.8 | 20.54x | 109472 | 105.80 | 109416 | 5.15 |
+| fb-ssnpp-10M | 18 | 1.4 | 26.86x | 109563 | 106.57 | 109551 | 3.97 |
+| fb-ssnpp-10M | 19 | 1.6 | 23.56x | 109529 | 106.56 | 109475 | 4.52 |
 | fb-ssnpp-1M | 10 | 1.4 | 23.78x | 113618 | 2.57 | 113483 | 0.11 |
 | fb-ssnpp-1M | 11 | 1.4 | 23.82x | 113563 | 2.57 | 113448 | 0.11 |
 | fb-ssnpp-1M | 12 | 1.4 | 23.79x | 113564 | 2.57 | 113449 | 0.11 |
@@ -55,6 +86,16 @@ Generated 2026-11-12T07:47:03 by `report.py` from 250 run records and 40 crossin
 | fb-ssnpp-1M | 17 | 1.4 | 23.75x | 113577 | 2.57 | 113431 | 0.11 |
 | fb-ssnpp-1M | 18 | 1.4 | 23.76x | 113564 | 2.57 | 113464 | 0.11 |
 | fb-ssnpp-1M | 19 | 1.4 | 23.78x | 113550 | 2.57 | 113411 | 0.11 |
+| spacev-10M | 10 | 2.4 | 20.09x | 6372.18 | 67.81 | 6368.31 | 3.38 |
+| spacev-10M | 11 | 2.0 | 24.14x | 6377.29 | 67.78 | 6375.7 | 2.81 |
+| spacev-10M | 12 | 2.2 | 17.79x | 6373.39 | 67.88 | 6368.71 | 3.82 |
+| spacev-10M | 13 | 2.0 | 24.04x | 6370.75 | 82.20 | 6366.67 | 3.42 |
+| spacev-10M | 14 | 2.4 | 19.63x | 6373.97 | 81.61 | 6363.22 | 4.16 |
+| spacev-10M | 15 | 2.2 | 21.81x | 6376.75 | 81.60 | 6366.8 | 3.74 |
+| spacev-10M | 16 | 2.4 | 24.31x | 6372.34 | 81.85 | 6362.47 | 3.37 |
+| spacev-10M | 17 | 2.2 | 21.74x | 6374.62 | 67.73 | 6371.94 | 3.11 |
+| spacev-10M | 18 | 2.0 | 24.24x | 6369.63 | 68.74 | 6368.22 | 2.84 |
+| spacev-10M | 19 | 2.4 | 20.18x | 6370.34 | 68.49 | 6361.76 | 3.39 |
 | spacev-1M | 10 | 2.0 | 21.73x | 7236.31 | 1.77 | 7231.92 | 0.08 |
 | spacev-1M | 11 | 2.4 | 18.86x | 7229.7 | 1.76 | 7220.98 | 0.09 |
 | spacev-1M | 12 | 2.0 | 21.73x | 7242.22 | 1.77 | 7227.81 | 0.08 |
