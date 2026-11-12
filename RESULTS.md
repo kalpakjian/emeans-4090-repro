@@ -1,6 +1,6 @@
 # e-means reproduction on an RTX 4090
 
-Generated 2026-11-12T09:15:26 by `report.py` from 456 run records and 70 crossing records.
+Generated 2026-11-12T09:16:47 by `report.py` from 456 run records and 70 crossing records.
 
 ## Hardware and software
 
@@ -107,9 +107,40 @@ Generated 2026-11-12T09:15:26 by `report.py` from 456 run records and 70 crossin
 | spacev-1M | 18 | 2.0 | 21.62x | 7241.13 | 1.76 | 7232.01 | 0.08 |
 | spacev-1M | 19 | 2.2 | 19.67x | 7229.71 | 1.76 | 7222.18 | 0.09 |
 
+## Figure 3: error per budget, e-means (GPU) vs Faiss k-means (CPU)
+
+Both arms start from the same centroids per seed; the e-means arm draws them on the GPU and saves them for the Faiss arm, so it must run first.
+
+### deep1b-1M (1 e-means seeds, 1 Faiss seeds)
+
+| budget | e-means train | e-means test | Faiss train | Faiss test |
+|---|---|---|---|---|
+| 1 | 0.391537 | 0.393692 | 0.400642 | 0.405338 |
+| 2 | 0.363764 | 0.389226 | 0.379339 | 0.397176 |
+| 3 | 0.360944 | 0.387805 | 0.372743 | 0.394009 |
+| 5 | 0.358407 | 0.386301 | 0.367548 | 0.391598 |
+| 8 | 0.357196 | 0.38642 | 0.364695 | 0.390386 |
+| 12 | 0.356108 | 0.386326 | 0.36322 | 0.389893 |
+| 17 | 0.355781 | 0.385649 | 0.362484 | 0.389544 |
+| 25 | 0.355104 | 0.385845 | 0.362051 | 0.389463 |
+
+### imagenet-clip-512-normalized (1 e-means seeds, 0 Faiss seeds)
+
+| budget | e-means train | e-means test | Faiss train | Faiss test |
+|---|---|---|---|---|
+| 1 | 0.220784 | 0.21645 | - | - |
+| 2 | 0.202995 | 0.21258 | - | - |
+| 3 | 0.20158 | 0.211833 | - | - |
+| 5 | 0.200451 | 0.211347 | - | - |
+| 8 | 0.200033 | 0.211063 | - | - |
+| 12 | 0.199607 | 0.211014 | - | - |
+| 17 | 0.199606 | 0.210821 | - | - |
+| 25 | 0.199315 | 0.211031 | - | - |
+
+
 ## How to read this
 
 - Test error transfers across hardware; **wall-clock does not**. The paper's timings are H100 (SM90, CuTe kernels); these are a 4090 (SM89, Triton backend), so compare the trend, never the absolute seconds.
-- `k` is the paper's 16384 at 1M rows (`paper_xb.k_for`), not the 1024/4096 used in hand-rolled benchmarks.
+- `k` is the paper's `paper_xb.k_for`: 16384 at 1M rows, 65536 at 10M — not the 1024/4096 used in hand-rolled benchmarks.
 - Timings follow the paper's protocol: a fresh process per run, an untimed warm-up, both methods in the same job on one GPU, one exact float64 scorer.
 - Raw JSON under `results/` is the source of truth; this file is generated from it.

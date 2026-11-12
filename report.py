@@ -61,6 +61,48 @@ def cell(recs):
 
 
 
+def figure3(out):
+    """Figure 3 lives beside the Table 3 crossings: one record per (dataset, method, seed).
+
+    Averaged over seeds per budget, so a missing arm shows "-" rather than silently averaging
+    over fewer seeds than the other column.
+    """
+    paths = sorted(glob.glob(os.path.join(out, "figure3", "*.json")))
+    if not paths:
+        return []
+
+    by_ds = collections.defaultdict(lambda: collections.defaultdict(dict))
+    for path in paths:
+        rec = jload(path)
+        by_ds[rec["dataset"]][rec["seed"]][rec["method"]] = {
+            p["budget"]: p for p in rec["points"]}
+
+    lines = ["", "## Figure 3: error per budget, e-means (GPU) vs Faiss k-means (CPU)", "",
+             "Both arms start from the same centroids per seed; the e-means arm draws them on the "
+             "GPU and saves them for the Faiss arm, so it must run first.", ""]
+    for name in sorted(by_ds):
+        seeds = by_ds[name]
+        budgets = sorted({b for per_method in seeds.values()
+                          for points in per_method.values() for b in points})
+
+        def avg(method, what, budget):
+            vals = [per_method[method][budget][what] for per_method in seeds.values()
+                    if method in per_method and budget in per_method[method]]
+            return fmt(statistics.mean(vals), "%.6g") if vals else "-"
+
+        n_em = sum(1 for per_method in seeds.values() if "emeans" in per_method)
+        n_fa = sum(1 for per_method in seeds.values() if "faiss" in per_method)
+        lines += ["### %s (%d e-means seeds, %d Faiss seeds)" % (name, n_em, n_fa), "",
+                  "| budget | e-means train | e-means test | Faiss train | Faiss test |",
+                  "|---|---|---|---|---|"]
+        for b in budgets:
+            lines.append("| %g | %s | %s | %s | %s |" % (
+                b, avg("emeans", "train", b), avg("emeans", "test", b),
+                avg("faiss", "train", b), avg("faiss", "test", b)))
+        lines.append("")
+    return lines
+
+
 def main():
     run_paths = sorted(glob.glob(os.path.join(OUT, "runs", "*", "*.json")))
     cross_paths = sorted(glob.glob(os.path.join(OUT, "crossing", "*.json")))
@@ -142,6 +184,8 @@ def main():
                 fmt((r.get("flash") or {}).get("seconds"), "%.2f"),
                 fmt(last.get("test_mse"), "%.6g"), fmt(last.get("seconds"), "%.2f")))
 
+    lines += figure3(OUT)
+
     lines += [
         "",
         "## How to read this",
@@ -149,8 +193,8 @@ def main():
         "- Test error transfers across hardware; **wall-clock does not**. The paper's timings are "
         "H100 (SM90, CuTe kernels); these are a 4090 (SM89, Triton backend), so compare the trend, "
         "never the absolute seconds.",
-        "- `k` is the paper's 16384 at 1M rows (`paper_xb.k_for`), not the 1024/4096 used in "
-        "hand-rolled benchmarks.",
+        "- `k` is the paper's `paper_xb.k_for`: 16384 at 1M rows, 65536 at 10M — not the "
+        "1024/4096 used in hand-rolled benchmarks.",
         "- Timings follow the paper's protocol: a fresh process per run, an untimed warm-up, both "
         "methods in the same job on one GPU, one exact float64 scorer.",
         "- Raw JSON under `results/` is the source of truth; this file is generated from it.",
