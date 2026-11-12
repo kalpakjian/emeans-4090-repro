@@ -106,7 +106,8 @@ def figure3(out):
 def main():
     run_paths = sorted(glob.glob(os.path.join(OUT, "runs", "*", "*.json")))
     cross_paths = sorted(glob.glob(os.path.join(OUT, "crossing", "*.json")))
-    if not run_paths and not cross_paths:
+    fig_paths = sorted(glob.glob(os.path.join(OUT, "figure3", "*.json")))
+    if not run_paths and not cross_paths and not fig_paths:
         print("nothing under %s yet: run ./run.sh download, then ./run.sh quick" % OUT)
         return 0
 
@@ -171,7 +172,7 @@ def main():
         lines += ["", "## Seeds that never crossed", ""]
         lines += ["- %s seed %d" % (d, s) for d, s in missed]
 
-    if len(recs) <= 200:
+    if 0 < len(recs) <= 200:
         lines += ["", "## Per seed", "",
                   "| dataset | seed | crossing | speedup | Flash test MSE | Flash s "
                   "| e-means test MSE | e-means s |",

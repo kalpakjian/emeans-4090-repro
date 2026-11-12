@@ -40,6 +40,7 @@ cd emeans-4090-repro
 ./run.sh download10m # 可選：補到 21.7 GB，10M 的前綴檔
 ./run.sh full10m     # 可選：Table 3 at 10M 的 DEEP*/SPACEV/SimSearchNet++
 ./run.sh figure4     # 可選：Figure 4（每個資料集 12×12 組，很重，見下表）
+./run.sh test        # 可選：report.py 的單元測試（純標準庫，不需要 GPU，幾毫秒）
 ./run.sh push        # 重算 RESULTS.md，commit 並推回 repo
 ```
 

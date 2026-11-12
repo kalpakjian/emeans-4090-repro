@@ -10,6 +10,7 @@
 #   ./run.sh figure4     Figure 4: 12 Flash iteration budgets x 12 e-means epoch budgets per seed
 #                        per dataset (heavy: ~240 fresh processes per dataset at 10 seeds)
 #   ./run.sh figure4-plot draw results/figure4.pdf from whatever figure4 runs exist
+#   ./run.sh test        unit tests for report.py (stdlib only, no GPU, seconds)
 #   ./run.sh report      regenerate RESULTS.md from whatever is in results/
 #   ./run.sh push        report + commit + push
 set -euo pipefail
@@ -49,6 +50,7 @@ case "${1:-}" in
             exit 2
         fi
         ( cd "$BENCH" && python paper_bench.py figure4 --plot --out "$OUT" ) ;;
+    test)     python -m unittest discover -s tests -v || exit 1; exit 0 ;;
     report)   python "$REPO/report.py"; exit 0 ;;
     push)
         python "$REPO/report.py"
