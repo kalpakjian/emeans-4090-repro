@@ -1,6 +1,6 @@
 # e-means reproduction on an RTX 4090
 
-Generated 2026-11-12T09:16:47 by `report.py` from 456 run records and 70 crossing records.
+Generated 2026-11-12T09:36:30 by `report.py` from 456 run records and 70 crossing records.
 
 ## Hardware and software
 
@@ -124,18 +124,18 @@ Both arms start from the same centroids per seed; the e-means arm draws them on 
 | 17 | 0.355781 | 0.385649 | 0.362484 | 0.389544 |
 | 25 | 0.355104 | 0.385845 | 0.362051 | 0.389463 |
 
-### imagenet-clip-512-normalized (1 e-means seeds, 0 Faiss seeds)
+### imagenet-clip-512-normalized (1 e-means seeds, 1 Faiss seeds)
 
 | budget | e-means train | e-means test | Faiss train | Faiss test |
 |---|---|---|---|---|
-| 1 | 0.220784 | 0.21645 | - | - |
-| 2 | 0.202995 | 0.21258 | - | - |
-| 3 | 0.20158 | 0.211833 | - | - |
-| 5 | 0.200451 | 0.211347 | - | - |
-| 8 | 0.200033 | 0.211063 | - | - |
-| 12 | 0.199607 | 0.211014 | - | - |
-| 17 | 0.199606 | 0.210821 | - | - |
-| 25 | 0.199315 | 0.211031 | - | - |
+| 1 | 0.220784 | 0.21645 | 0.224545 | 0.224016 |
+| 2 | 0.202995 | 0.21258 | 0.211619 | 0.218509 |
+| 3 | 0.20158 | 0.211833 | 0.208012 | 0.216455 |
+| 5 | 0.200451 | 0.211347 | 0.205297 | 0.214904 |
+| 8 | 0.200033 | 0.211063 | 0.203871 | 0.214124 |
+| 12 | 0.199607 | 0.211014 | 0.203184 | 0.213735 |
+| 17 | 0.199606 | 0.210821 | 0.202848 | 0.21345 |
+| 25 | 0.199315 | 0.211031 | 0.202672 | 0.213344 |
 
 
 ## How to read this
