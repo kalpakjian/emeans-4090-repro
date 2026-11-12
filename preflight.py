@@ -111,6 +111,36 @@ def flash_matched():
     return "0.3.1, float32 norms, %s" % os.path.dirname(marker)
 
 
+def warn(name, fn):
+    """Advisory check: a failure is printed as `warn` and never fails the run."""
+    try:
+        detail = fn()
+    except Exception as exc:  # noqa: BLE001
+        print("warn  %-26s %s" % (name, str(exc)[:300]))
+    else:
+        print("ok    %-26s %s" % (name, "" if detail is None else detail))
+
+
+def faiss_tls(host="dl.fbaipublicfiles.com"):
+    """The 10M prefixes live on dl.fbaipublicfiles.com, whose certificate lapsed 2026-11-11.
+
+    Worth saying out loud before ./run.sh download10m spends 21 GB: the failure otherwise appears
+    minutes in, as a CERTIFICATE_VERIFY_FAILED traceback from the range fetcher. `host` is a
+    parameter so the healthy path can be exercised too.
+    """
+    import socket
+    import ssl
+
+    try:
+        with socket.create_connection((host, 443), timeout=10) as raw:
+            with ssl.create_default_context().wrap_socket(raw, server_hostname=host) as tls:
+                cert = tls.getpeercert()
+    except ssl.SSLError as exc:
+        raise AssertionError("%s certificate rejected (%s): ./run.sh download10m needs "
+                             "EMEANS_INSECURE_TLS=1" % (host, exc))
+    return "%s certificate valid to %s" % (host, cert.get("notAfter", "?"))
+
+
 def datasets():
     """Load every 1M dataset the way the scripts will (memory maps, no copy)."""
     os.environ["EMEANS_DATA"] = DATA
@@ -143,6 +173,7 @@ def main():
     check("e-means gpu run", emeans_smoke)
     check("1M datasets", datasets)
     check("disk", disk)
+    warn("faiss dl tls", faiss_tls)
     if fails:
         print("\n%d check(s) FAILED: %s" % (len(fails), ", ".join(fails)))
         return 1

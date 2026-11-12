@@ -98,6 +98,7 @@ cd emeans-4090-repro
    `patches/0003-download-insecure-tls.patch` 提供 `EMEANS_INSECURE_TLS=1` 這個**要自己開**的開關
    （預設仍是驗證），真正的完整性保證是腳本結尾的 fingerprint 校驗：
    `EMEANS_INSECURE_TLS=1 ./run.sh download10m`。等 Meta 換憑證就可以拿掉這個環境變數。
+   `preflight.py` 也會印一行 `warn  faiss dl tls`（只是警告，不會讓 preflight 失敗）。
 
 ## Windows 端的預先驗證（已被取代）
 
