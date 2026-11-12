@@ -95,12 +95,16 @@ cd emeans-4090-repro
    （預設仍是驗證），真正的完整性保證是腳本結尾的 fingerprint 校驗：
    `EMEANS_INSECURE_TLS=1 ./run.sh download10m`。等 Meta 換憑證就可以拿掉這個環境變數。
 
-## Windows 端的預先驗證（已完成）
+## Windows 端的預先驗證（已被取代）
 
-無法在沒開機的 Omarchy 上跑 GPU 部分，但以下已在 Windows 的 Python 3.14 + faiss-cpu 1.16.0 上驗證：
+這一節原本是「Omarchy 沒開機，所以先在 Windows 上做 CPU 部分的預檢」。**現在已經不需要了**：
+Table 3 的 1M（4 資料集 × 10 seeds）與 10M（3 資料集 × 10 seeds）、Figure 3 的 1M 面板，
+都已在 Omarchy 的 4090 上實跑，`RESULTS.md` 就是產物。
+
+而且 Windows 做不到這裡真正重要的事：`flash-kmeans` 0.3.1 是 Triton 套件，官方沒有 Windows
+wheel，少了它就沒有 Flash-KMeans baseline，也就沒有 crossing／speedup 這兩個數字。
+當時在 Windows 上驗證過、現在仍然成立的三件事：
 
 - `faiss-cpu 1.16.0` wheel **已內含** `faiss.contrib.e_means`，不需要再從 checkout 複製。
-- `report.py` 以合成 JSON fixture 驗證過表格/中位數/crossing 邏輯，輸出格式見 `RESULTS.md`。
-- `patches/0001-xb-backend-env.patch` 以 `git apply --check` 對 v1.16.0 的 `paper_xb.py` 驗證通過。
-- CPU 上的 e-means 趨勢（500k×96、k=256、無 subsample）：e-means 2 epochs 1.36 s / loss 127.29
-  vs Lloyd 25 iters 5.83 s / loss 128.00。
+- `report.py` 是純標準庫，任何有 Python 的機器都能跑（本機已重跑多次）。
+- `patches/*.patch` 對 v1.16.0 的三個檔案都能 `git apply --check` 通過。

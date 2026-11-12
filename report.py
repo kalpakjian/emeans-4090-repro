@@ -13,6 +13,20 @@ import sys
 REPO = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(REPO, "results")
 ORDER = ["deep1b-1M", "dino10b-1M-div4096", "spacev-1M", "fb-ssnpp-1M"]
+SCALES = ["1M", "10M", "100M"]        # Table 3 is per scale; one table each
+
+
+def scale_of(name):
+    """The scale is a hyphen-delimited token: deep1b-10M, dino10b-1M-div4096 both work.
+
+    Longest first so 100M can never be read as 10M; unrecognised names get their own bucket
+    rather than being guessed into a table.
+    """
+    tokens = name.split("-")
+    for scale in ["100M", "10M", "1M"]:
+        if scale in tokens:
+            return scale
+    return "?"
 
 
 def jload(path):
@@ -60,6 +74,9 @@ def main():
     for r in recs:
         by_dataset[r["dataset"]].append(r)
     names = [n for n in ORDER if n in by_dataset] + sorted(set(by_dataset) - set(ORDER))
+    by_scale = collections.defaultdict(list)
+    for n in names:
+        by_scale[scale_of(n)].append(n)
 
     gpu = collections.Counter(r.get("gpu") for r in runs).most_common(1)
     backend = collections.Counter(r.get("assignment_backend") for r in runs
@@ -85,19 +102,27 @@ def main():
         % ", ".join("%s (%d runs)" % (k, v) for k, v in backend),
         "| `faiss.contrib.e_means` source hash | %s |" % (sha[0][0] if sha else "?"),
         "",
-        "## Table 3, 1M rows: epochs of e-means to reach Flash-KMeans' error after 25 iterations",
+        "## Table 3: epochs of e-means to reach Flash-KMeans' error after 25 iterations",
         "",
-        "| dataset | seeds | crossed | crossing (epochs) | speedup | Flash@25 test MSE "
-        "| Flash@25 s | e-means s | input | batch |",
-        "|---|---|---|---|---|---|---|---|---|---|",
     ]
-    for name in names:
-        c = cell(by_dataset[name])
-        lines.append("| %s | %d | %d | %s | %s | %s | %s | %s | %s | %s |" % (
-            name, c["seeds"], c["crossed"], fmt(c["crossing"], "%.1f"),
-            fmt(c["speedup"], "%.2fx"), fmt(c["flash_mse"], "%.6g"),
-            fmt(c["flash_seconds"], "%.2f"), fmt(c["emeans_seconds"], "%.2f"),
-            c["input"][0][0] if c["input"] else "?", fmt(c["batch"], "%.0f")))
+    for scale in SCALES + ["?"]:
+        if scale not in by_scale:
+            continue
+        lines += [
+            "### %s rows" % scale if scale != "?" else "### scale not in the name",
+            "",
+            "| dataset | seeds | crossed | crossing (epochs) | speedup | Flash@25 test MSE "
+            "| Flash@25 s | e-means s | input | batch |",
+            "|---|---|---|---|---|---|---|---|---|---|",
+        ]
+        for name in by_scale[scale]:
+            c = cell(by_dataset[name])
+            lines.append("| %s | %d | %d | %s | %s | %s | %s | %s | %s | %s |" % (
+                name, c["seeds"], c["crossed"], fmt(c["crossing"], "%.1f"),
+                fmt(c["speedup"], "%.2fx"), fmt(c["flash_mse"], "%.6g"),
+                fmt(c["flash_seconds"], "%.2f"), fmt(c["emeans_seconds"], "%.2f"),
+                c["input"][0][0] if c["input"] else "?", fmt(c["batch"], "%.0f")))
+        lines.append("")
 
     missed = [(r["dataset"], r["seed"]) for r in recs if r.get("crossing") is None]
     if missed:
